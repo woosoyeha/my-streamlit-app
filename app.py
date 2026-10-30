@@ -5,7 +5,7 @@ import streamlit as st
 from openai import OpenAI
 
 # OpenAI 클라이언트 생성
-client =
+client = OpenAI()
 
 # 페이지 설정
 st.set_page_config(page_title = "텍스트 음성 변환기", page_icon = "💬")
