@@ -8,8 +8,8 @@ from openai import OpenAI
 client = OpenAI()
 
 # 페이지 설정
-st.set_page_config(page_title = "텍스트 음성 변환기", page_icon = "💬")
-st.title("💬 텍스트 음성 변환기")
+st.set_page_config(page_title="텍스트 음성 변환", page_icon="🔊")
+st.title("🔊 텍스트 → 음성 변환 실습")
 
 # 텍스트 입력
 text = st.text_area(
@@ -18,14 +18,14 @@ text = st.text_area(
 )
 
 # 버튼
-if st.button("변환"):
+if st.button("음성 생성"):
     if text.strip() == "":
-        st.warning("변환할 문장을 입력하세요.")
+        st.warning("텍스트를 입력하세요")
     else:
         # TTS 생성
         speech = client.audio.speech.create(
-            model= "gpt-4o-mini-tts",
-            voice= "Nova",
+            model="gpt-4o-mini-tts",
+            voice="nova",
             input=text
         )
         audio_bytes = speech.content
