@@ -7,9 +7,9 @@ from openai import OpenAI
 client = OpenAI()
 
 # 페이지 설정
-st.set_page_config(page_title="간단한 한영 번역기", page_icon="📖")
-st.title("📖 단순하지만 멋진 한영 번역기")
-st.write("기록이 남지 않는 한영 번역기 입니다.")
+st.set_page_config(page_title="한글 → 영어 번역기", page_icon="🤖")
+st.title("🤖 한글 → 영어 번역기")
+st.write("입력한 한글 문장을 자연스러운 영어로 번역합니다.")
 
 # 사용자 입력(텍스트)
 korean_text = st.text_area(
@@ -19,17 +19,17 @@ korean_text = st.text_area(
 )
 
 # 번역 버튼
-if st.button("번역"):
+if st.button("번역하기"):
 
     if not korean_text.strip():
-        st.warning("한국어를 임력하세요")
+        st.warning("번역할 한글 문장을 입력하세요.")
     else:
         with st.spinner("번역 중입니다..."):
 
             # 시스템 역할
             sys_role = """
-                당신은 한연 번역 전문가 입니다.
-                실생활에서 사용할만한 영어로 번역합니다.
+            당신은 한국어를 자연스러운 영어로 번역하는 전문 번역가입니다.
+            의미를 유지하면서 원어민이 쓰는 표현으로 번역합니다.
             """
 
             # 프롬프트 구성
@@ -51,5 +51,5 @@ if st.button("번역"):
             # 결과 출력
             translated_text = response.output_text
 
-            st.subheader("AI 답변")
+            st.subheader("번역 결과")
             st.success(translated_text)
