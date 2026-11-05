@@ -64,7 +64,7 @@ GH_USER = "HanJiHo-0619"
 REPO = "my-streamlit-app"
 
 # 메일 수신 주소: 여기서 변경합니다. 요청에서 지정한 주소가 있으면 그 주소가 우선입니다.
-DEFAULT_RECIPIENT = "giho9890@naver.com"
+DEFAULT_RECIPIENT = "hamin305@gmail.com"
 
 # 주소록: "팀장님께 보내줘"처럼 호칭으로 요청하면 여기서 주소를 찾습니다. '님·께·에게'는 자동으로 뗍니다.
 # 예) CONTACTS = {"팀장": "leader@example.com", "박과장": "park@example.com"}
