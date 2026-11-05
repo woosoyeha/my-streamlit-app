@@ -1151,7 +1151,7 @@ def resolve_event_deadline(event, meeting_date):
         year, month, day = month_day.groups()
         resolved = date(int(year) if year else base.year,int(month),int(day))
         rule='원문 날짜 · 연도는 회의 기준일 사용' if not year else '원문 명시 날짜'
-    elif (event.get('start_date') or '').strip() and not re.search(r'다음|이번|모레|내일|오늘|당일|요일|\d+\s*일\s*(?:뒤|후)', due):
+    elif (event.get('start_date') or '').strip() and not re.search(r'다음|이번|모레|내일|명일|오늘|금일|당일|요일|\d+\s*일\s*(?:뒤|후)', due):
         # 모델의 구조화된 명시 날짜가 이미 있으면 먼저 유지합니다.
         date.fromisoformat(event['start_date'])
         return result, '분석에서 추출한 명시 날짜'
@@ -1172,8 +1172,8 @@ def resolve_event_deadline(event, meeting_date):
                 resolved=base-timedelta(days=base.weekday())+timedelta(weeks={'이번':0,'다음':1,'다다음':2}[kind],days=WEEK_DEADLINE_WEEKDAY)
                 rule='앱 규칙: 요일 없는 '+kind+' 주 기한 → '+list(weekdays)[WEEK_DEADLINE_WEEKDAY]+'요일'
         elif '모레' in normalized:resolved=base+timedelta(days=2);rule='회의 기준일 + 2일'
-        elif '내일' in normalized:resolved=base+timedelta(days=1);rule='회의 기준일 + 1일'
-        elif '오늘' in normalized or '당일' in normalized:resolved=base;rule='회의 기준일'
+        elif '내일' in normalized or '명일' in normalized:resolved=base + timedelta(days=1);rule='회의 기준일 + 1일'
+        elif '오늘' in normalized or '금일' in normalized or '당일' in normalized:resolved=base;rule='회의 기준일'
         elif offset:resolved=base+timedelta(days=int(offset.group(1)));rule='회의 기준일 + '+offset.group(1)+'일'
         elif bare_day:
             delta=(weekdays[bare_day.group(1)]-base.weekday())%7
