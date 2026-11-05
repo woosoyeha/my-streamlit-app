@@ -1402,6 +1402,7 @@ def render_voice():
         st.download_button('이 음성 다운로드',vault[active]['data'],file_name='answer.wav',mime='audio/wav',key='audio_download_'+active)
  
  
+
 def speak_message(message):
     """답변을 음성으로 만듭니다. 아주 긴 답변은 업무를 모두 담은 낭독 대본으로 줄여 읽습니다.
     텍스트 답변은 항상 그대로 유지합니다. voice_mode: full(전체) / script(낭독 대본) / failed,
@@ -1409,20 +1410,30 @@ def speak_message(message):
     full=speech_text(message['content'])
     script,mode=full,'full'
     if len(full)>VOICE_SCRIPT_THRESHOLD:
-        try:script,mode=voice_script(full),'script'
-        except Exception:pass  # 대본 생성이 실패하면 전체 답변을 그대로 읽습니다.
+        try:
+            script,mode=voice_script(full),'script'
+        except Exception as e:
+            print(f"[VOICE SCRIPT ERROR] {type(e).__name__}: {e}")
+
     try:
         wav,engine=synthesize_speech(script)
         cache_answer_audio(message,wav)
         message['voice_mode']=mode
         message['voice_engine']=engine
-        if mode=='script':message['voice_text']=script
-        else:message.pop('voice_text',None)
+        if mode=='script':
+            message['voice_text']=script
+        else:
+            message.pop('voice_text',None)
         return True
-    except (TimeoutError, asyncio.TimeoutError):
+
+    except (TimeoutError, asyncio.TimeoutError) as e:
+        print(f"[VOICE TIMEOUT] {type(e).__name__}: {e}")
         st.session_state.voice_error=f'음성 생성이 {VOICE_TIMEOUT_SECONDS}초 안에 끝나지 않았습니다. 텍스트 답변은 유지됩니다.'
-    except Exception:
-        st.session_state.voice_error='음성 생성에 실패했습니다. 텍스트 답변은 유지됩니다.'
+
+    except Exception as e:
+        print(f"[VOICE ERROR] {type(e).__name__}: {e}")
+        st.session_state.voice_error=f'음성 생성 실패: {type(e).__name__}. 텍스트 답변은 유지됩니다.'
+
     message['voice_mode']='failed'
     return False
 
