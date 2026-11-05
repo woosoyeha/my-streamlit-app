@@ -849,14 +849,14 @@ def get_calendar_service():
 
 # 설정 파일/Secrets의 Gmail 발신 계정을 읽습니다. 수신 주소와는 별개입니다.
 def saved_email():
-    return (os.getenv(MAIL_ADDRESS_SECRET) or "").strip()
+    return str(st.secrets.get("GMAIL_ADDRESS", "")).strip()
 
 
 # 실제 비밀번호는 Streamlit Secrets에서 읽습니다. 코드/Drive 노트북에 적지 마세요.
 def send_email(to, subject, body):
     recipient = (to or "").strip() or DEFAULT_RECIPIENT.strip()
     sender = saved_email()
-    password = os.getenv(MAIL_PASSWORD_SECRET)
+    password = str(st.secrets.get("GMAIL_APP_PASSWORD", "")).strip()
     if not recipient or "@" not in recipient or any(c in recipient for c in "\r\n"):
         return {"status": "failed", "error": "수신 이메일 주소를 확인하세요."}
     if any(c in (subject or "") for c in "\r\n"):
