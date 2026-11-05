@@ -1850,9 +1850,9 @@ def render_meetings():
     with summary_tab:
         with st.container(border=True, key='card_summary'):
             if st.session_state.summary:
-                st.markdown(readable_markdown(st.session_state.summary))
+                summary_text = summary_without_quotes(st.session_state.summary)
+                st.markdown(summary_text)
                 st.caption('🔊 회의 요약 내용을 음성으로도 들을 수 있어요.')
-                summary_text = readable_markdown(st.session_state.summary)
                 summary_key = hashlib.sha256(summary_text.encode('utf-8')).hexdigest()
                 if st.button('🔊 회의 요약 듣기', key='listen_meeting_summary', use_container_width=True):
                     try:
@@ -2233,6 +2233,14 @@ def render_calendar_diagnostics():
 def readable_markdown(text):
     """Normalize excessive blank lines without modifying stored meeting facts."""
     return re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+', '\n\n', str(text or '').strip())
+
+def summary_without_quotes(text):
+    """회의 요약 화면에서는 원문 근거 인용을 빼서 보여 줍니다. 업무 카드의 evidence는 그대로입니다."""
+    kept = [
+        line for line in str(text or '').splitlines()
+        if not re.match(r'\s*-?\s*원본\s*근거\s*[:：]', line)
+    ]
+    return readable_markdown('\n'.join(kept))
 
 def close_ui_dialog():
     st.session_state.pop('active_dialog', None)
