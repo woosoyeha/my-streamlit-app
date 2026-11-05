@@ -60,7 +60,7 @@ GOOGLE_CALENDAR_URL = "https://calendar.google.com/calendar/"
 
 # 자주 바꾸는 GitHub 배포 설정은 여기에서만 수정합니다.
 # GH_TOKEN은 Colab Secrets에 보관하며 코드에 직접 입력하지 않습니다.
-GH_USER = "HanJiHo-0619"
+GH_USER = "woosoyeha"
 REPO = "my-streamlit-app"
 
 # 메일 수신 주소: 여기서 변경합니다. 요청에서 지정한 주소가 있으면 그 주소가 우선입니다.
