@@ -1242,7 +1242,7 @@ def calendar_error_message(error):
 # 이 조각을 저장하는 것만으로 음성 API가 호출되지는 않습니다.
 
 # ========================================================================
- 
+
 # PCM 바이트에 WAV 헤더를 붙입니다. 파일을 서버에 저장하지 않습니다.
 
 def pcm_to_wav(pcm, rate=24000):
@@ -1260,8 +1260,8 @@ def pcm_to_wav(pcm, rate=24000):
         wf.writeframes(pcm)
 
     return buf.getvalue()
- 
- 
+
+
 # 완성된 답변을 Gemini Live로 읽어 WAV 바이트를 반환합니다. 도구 선택은 하지 않습니다.
 
 async def _live_speak_impl(text, retry=False):
@@ -1323,8 +1323,8 @@ async def _live_speak_impl(text, retry=False):
                 break
 
     return bytes(spoken)  # PCM. 비었는지는 _speak_chunk에서 확인합니다.
- 
- 
+
+
 def speech_chunks(text, limit=VOICE_CHUNK_CHARS):
 
     """문장 경계에서 limit자 이내 조각으로 나눕니다. 한 문장이 너무 길면 쉼표·공백에서 한 번 더 나눕니다."""
@@ -1356,15 +1356,15 @@ def speech_chunks(text, limit=VOICE_CHUNK_CHARS):
     if current:chunks.append(current)
 
     return chunks
- 
- 
+
+
 def audio_too_short(pcm, text):
 
     """Live 응답은 가끔 비거나 잘려서 옵니다. 글자 수에 비해 너무 짧으면 실패로 봅니다."""
 
     return len(pcm)/48000 < max(0.5,len(text)*VOICE_MIN_SECONDS_PER_CHAR)  # 24kHz·16bit·mono = 48000바이트/초
- 
- 
+
+
 async def _speak_chunk(text, gate):
 
     """조각 하나를 낭독합니다. 빈/잘린 응답이면 대본 형식으로 최대 VOICE_ATTEMPTS번까지 다시 생성합니다."""
@@ -1378,8 +1378,8 @@ async def _speak_chunk(text, gate):
             if not audio_too_short(pcm,text):return pcm
 
     raise RuntimeError('음성 응답이 비어 있거나 잘렸습니다.')
- 
- 
+
+
 async def _live_speak_all(text):
 
     """조각을 최대 VOICE_PARALLEL개씩 동시에 만들고 원래 순서대로 0.25초 쉼을 넣어 이어 붙입니다."""
@@ -1395,15 +1395,15 @@ async def _live_speak_all(text):
     pause=b'\x00\x00'*int(24000*0.25)
 
     return pcm_to_wav(pause.join(pcms))
- 
- 
+
+
 async def live_speak(text, timeout=VOICE_TIMEOUT_SECONDS):
 
     """연결 시작부터 모든 조각의 음성 수신 완료까지 전체에 제한 시간을 적용합니다."""
 
     return await asyncio.wait_for(_live_speak_all(text), timeout=timeout)
- 
- 
+
+
 def speech_text(text):
 
     """화면용 마크다운 기호(**, #, 목록 기호, 링크)를 낭독용 일반 문장으로 정리합니다."""
@@ -1415,8 +1415,8 @@ def speech_text(text):
     text=re.sub(r'^\s*(?:[-•]|\d+\.)\s+','',text,flags=re.M)
 
     return re.sub(r'\n{2,}','\n',text).strip()
- 
- 
+
+
 def _tts_pcm(text):
 
     """Gemini 전용 TTS로 답변 전체를 한 번에 낭독해 PCM(24kHz·16bit·mono)을 받습니다.
@@ -1454,8 +1454,8 @@ def _tts_pcm(text):
     parts = content.parts if content and content.parts else []
 
     return b"".join(audio_to_pcm(p.inline_data.data) for p in parts if p.inline_data and p.inline_data.data)
- 
- 
+
+
 def audio_to_pcm(data):
 
     """TTS 응답에서 소리(PCM)만 꺼냅니다.
@@ -1475,8 +1475,8 @@ def audio_to_pcm(data):
             raise RuntimeError("지원하지 않는 음성 형식입니다.")  # 예비 Live 경로로 넘어갑니다.
 
         return wf.readframes(wf.getnframes())
- 
- 
+
+
 def synthesize_speech(text):
 
     """1순위 전용 TTS(같은 목소리), 실패하면 2순위 Live 조각 동시 생성. 반환: (WAV 바이트, 'tts' 또는 'live')"""
@@ -1502,8 +1502,8 @@ def synthesize_speech(text):
             pass  # 503(요청 몰림)·시간 초과·빈 응답이면 한 번 더 시도한 뒤 예비 경로로 넘어갑니다.
 
     return asyncio.run(live_speak(text, VOICE_TIMEOUT_SECONDS)), "live"
- 
- 
+
+
 def voice_script(text):
 
     """아주 긴 답변을 낭독 대본으로 줄입니다. 김 대리 업무명·마감은 모두 남기고 새 사실은 추가하지 않습니다."""
@@ -1517,8 +1517,8 @@ def voice_script(text):
     if not script:raise RuntimeError('낭독 대본이 비어 있습니다.')
 
     return script
- 
- 
+
+
 # 저장된 음성을 브라우저에서 재생합니다. 중복 재생 방지용 상태를 사용합니다.
 
 def render_voice():
@@ -1562,8 +1562,8 @@ def render_voice():
         st.caption('플레이어에서 일시정지/계속 재생이 가능합니다. 재생 막대를 맨 앞으로 옮기면 처음부터 들을 수 있습니다.')
 
         st.download_button('이 음성 다운로드',vault[active]['data'],file_name='answer.wav',mime='audio/wav',key='audio_download_'+active)
- 
- 
+
+
 def speak_message(message):
 
     """답변을 음성으로 만듭니다. 아주 긴 답변은 업무를 모두 담은 낭독 대본으로 줄여 읽습니다.
@@ -1608,7 +1608,7 @@ def speak_message(message):
 
     message['voice_mode']='failed'
 
-    return False 
+    return False
 
 
 # ========================================================================
