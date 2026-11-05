@@ -1431,8 +1431,12 @@ def speak_message(message):
         st.session_state.voice_error=f'음성 생성이 {VOICE_TIMEOUT_SECONDS}초 안에 끝나지 않았습니다. 텍스트 답변은 유지됩니다.'
 
     except Exception as e:
-        print(f"[VOICE ERROR] {type(e).__name__}: {e}")
-        st.session_state.voice_error=f'음성 생성 실패: {type(e).__name__}. 텍스트 답변은 유지됩니다.'
+        import traceback
+        traceback.print_exc()
+
+        st.session_state.voice_error = (
+            f"음성 생성 실패: {type(e).__name__}: {e}"
+        )
 
     message['voice_mode']='failed'
     return False
