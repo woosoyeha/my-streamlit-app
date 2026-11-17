@@ -261,17 +261,43 @@ for message in st.session_state.messages:
     with st.chat_message(role):
         st.markdown(message.content)
 
-# 사용자 입력 처리
+# 사용자 질문 입력
 user_input = st.chat_input("메시지를 입력하세요.")
+
 if user_input:
-    # 사용자 메시지 표시
-    st.chat_message("user").markdown(user_input)
 
-    # 응답 출력
-    with st.chat_message("assistant"):
-        response_stream = chain.stream({"input": user_input})
-        full_response = st.write_stream(response_stream)
+    if st.session_state.rag_chain is None:
+        st.warning("먼저 백서 PDF를 업로드해 주세요.")
 
-    # 대화 기록 저장
-    st.session_state.messages.append(HumanMessage(content=user_input))
-    st.session_state.messages.append(AIMessage(content=full_response))
+    else:
+        # 사용자 질문 표시
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        # 사용자 질문 저장
+        st.session_state.messages.append(
+            HumanMessage(content=user_input)
+        )
+
+        # 챗봇 답변 생성
+        with st.chat_message("assistant"):
+
+            with st.spinner(
+                "백서에서 내용을 찾고 답변을 검증하고 있습니다..."
+            ):
+
+                try:
+                    response = st.session_state.rag_chain.invoke(
+                        {"input": user_input}
+                    )
+
+                    st.markdown(response)
+
+                    # 챗봇 답변 저장
+                    st.session_state.messages.append(
+                        AIMessage(content=response)
+                    )
+
+                except Exception as e:
+                    st.error("답변을 생성하는 중 오류가 발생했습니다.")
+                    st.exception(e)
